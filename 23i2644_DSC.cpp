@@ -1,6 +1,7 @@
 #include <conio.h>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 
 using namespace std;
@@ -70,6 +71,17 @@ class List
             temp = temp->next;
 
         delete temp;
+    }
+
+    void save()
+    {
+        ofstream file("save.txt");
+        Node *temp = head;
+        while (temp != nullptr)
+        {
+            file << temp->data;
+            temp = temp->next;
+        }
     }
 
     ~List()
@@ -383,6 +395,10 @@ int main()
         input = getche(); // echoes onto the screen
         Text->Insertion(input);
 
+        // CTRL + S ascii
+        if (input == 19)
+            Text->save();
+
         // if space key isn't pressed keep enqueueing the word letters
         if (input != 32)
             wordQueue->enqueue(input);
@@ -396,7 +412,7 @@ int main()
         }
 
         // clear screen everytime and show the updated text
-        system("CLS");
+        system("cls");
         cout << "\t\tNOTEPAD\n";
         cout << "\t-----------------------\n";
         Text->Display();
