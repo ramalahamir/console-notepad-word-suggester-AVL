@@ -1,4 +1,4 @@
-#include "C:/Users/Administrator/vcpkg/installed/x64-windows/include/curses.h"
+#include <conio.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -14,51 +14,6 @@ struct Node
     {
         data = val;
         next = nullptr;
-    }
-};
-
-class Stack
-{
-  private:
-    Node *top;
-
-  public:
-    Stack() { top = nullptr; }
-
-    void push(char value)
-    {
-        Node *newNode = new Node(value);
-        newNode->next = top;
-        top = newNode;
-    }
-
-    char pop()
-    {
-        if (top == nullptr)
-            return '\0';
-
-        Node *temp = top;
-        top = top->next;
-
-        char data = temp->data;
-        delete temp;
-
-        return data;
-    }
-
-    char peek()
-    {
-        if (top == nullptr)
-            return '\0';
-        return top->data;
-    }
-
-    bool isEmpty() { return top == nullptr; }
-
-    ~Stack()
-    {
-        while (top != nullptr)
-            pop();
     }
 };
 
@@ -336,10 +291,7 @@ AVLTree *readDictFile()
     else
     {
         // show error and close window
-        mvprintw(0, 0, "error in opening file");
-        getch();
-        endwin();
-        exit(0);
+        cout << "error opening file";
     }
     file.close();
 
@@ -348,10 +300,20 @@ AVLTree *readDictFile()
 
 int main()
 {
-    initscr();
+
+    // making the dictionary tree
     AVLTree *dict = readDictFile();
-    refresh();
-    getch();
-    endwin();
+    Queue word();
+
+    cout << "\t\tNOTEPAD\n";
+    cout << "\t-----------------------\n";
+
+    char input;
+    do
+    {
+        input = getche(); // echoes onto the screen
+
+    } while (input != 27); // ESC key (quit)
+
     return 0;
 }
