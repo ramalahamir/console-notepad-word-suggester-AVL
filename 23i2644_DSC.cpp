@@ -17,6 +17,74 @@ struct Node
     }
 };
 
+class List
+{
+  private:
+    Node *head;
+
+  public:
+    List() { head = nullptr; }
+
+    void Insertion(char data)
+    {
+        Node *newNode = new Node(data);
+        if (head == nullptr)
+        {
+            head = newNode;
+            return;
+        }
+        Node *temp = head;
+        while (temp->next != nullptr)
+            temp = temp->next;
+        temp->next = newNode;
+    }
+
+    void printWord()
+    {
+        Node *temp = head;
+        while (temp != nullptr)
+        {
+            cout << temp->data;
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+
+    void Backspace()
+    {
+        // no data to delete
+        if (head == nullptr)
+            return;
+
+        // If there's only one letter in the list
+        if (head->next == nullptr)
+        {
+            delete head;
+            head = nullptr;
+            return;
+        }
+
+        // Traverse to the last letter
+        Node *temp = head;
+        while (temp->next != nullptr)
+            temp = temp->next;
+
+        delete temp;
+    }
+
+    ~List()
+    {
+        Node *curr = head;
+        Node *NN;
+        while (curr != nullptr)
+        {
+            NN = curr->next;
+            delete curr;
+            curr = NN;
+        }
+    }
+};
+
 class Queue
 {
   private:
@@ -303,7 +371,7 @@ int main()
 
     // making the dictionary tree
     AVLTree *dict = readDictFile();
-    Queue word();
+    Queue *wordQueue = new Queue();
 
     cout << "\t\tNOTEPAD\n";
     cout << "\t-----------------------\n";
@@ -312,6 +380,14 @@ int main()
     do
     {
         input = getche(); // echoes onto the screen
+
+        // if space key isn't pressed keep enqueueing the word letters
+        if (input != 32)
+            wordQueue->enqueue(input);
+        else
+        {
+            // word suggestions and modifications
+        }
 
     } while (input != 27); // ESC key (quit)
 
