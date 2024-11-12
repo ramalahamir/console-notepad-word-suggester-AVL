@@ -1,0 +1,3 @@
+Hello, this is a dummy text file.
+You can load this text into your notepad program.
+It will be displayed when you press Ctrl + L.hellooo
