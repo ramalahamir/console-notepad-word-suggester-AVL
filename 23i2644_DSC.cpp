@@ -1,7 +1,8 @@
 #include "C:/Users/Administrator/vcpkg/installed/x64-windows/include/curses.h"
-using namespace std;
-
+#include <fstream>
 #include <iostream>
+#include <string>
+
 using namespace std;
 
 struct Node
@@ -117,14 +118,14 @@ class Queue
 
 struct treeNode
 {
-    string val;
+    string word;
     treeNode *left;
     treeNode *right;
     int height;
 
-    treeNode(string val)
+    treeNode(string word)
     {
-        this->val = val;
+        this->word = word;
         left = right = nullptr;
         height = 1;
     }
@@ -188,15 +189,15 @@ class AVLTree
     }
 
     // Insert root
-    treeNode *insert(treeNode *root, string val)
+    treeNode *insert(treeNode *root, string word)
     {
         if (root == nullptr)
-            return new treeNode(val);
+            return new treeNode(word);
 
-        if (val < root->val)
-            root->left = insert(root->left, val);
-        else if (val > root->val)
-            root->right = insert(root->right, val);
+        if (root->word > word)
+            root->left = insert(root->left, word);
+        else if (root->word < word)
+            root->right = insert(root->right, word);
         else
             return root; // equal case (not allowed)
 
@@ -205,19 +206,19 @@ class AVLTree
 
         // Balance the tree
         // LL case
-        if (balanceFactor > 1 && val < root->left->val)
+        if (balanceFactor > 1 && word < root->left->word)
             return rightRotation(root);
         // RR case
-        if (balanceFactor < -1 && val > root->right->val)
+        if (balanceFactor < -1 && word > root->right->word)
             return leftRotation(root);
         // LR
-        if (balanceFactor > 1 && val > root->left->val)
+        if (balanceFactor > 1 && word > root->left->word)
         {
             root->left = leftRotation(root->left);
             return rightRotation(root);
         }
         // RL case
-        if (balanceFactor < -1 && val < root->right->val)
+        if (balanceFactor < -1 && word < root->right->word)
         {
             root->right = rightRotation(root->right);
             return leftRotation(root);
@@ -236,15 +237,15 @@ class AVLTree
     }
 
     // Delete root
-    treeNode *deletetreeNode(treeNode *root, string val)
+    treeNode *deletetreeNode(treeNode *root, string word)
     {
         if (root == nullptr)
             return root;
 
-        if (val < root->val)
-            root->left = deletetreeNode(root->left, val);
-        else if (val > root->val)
-            root->right = deletetreeNode(root->right, val);
+        if (root->word > word)
+            root->left = deletetreeNode(root->left, word);
+        else if (root->word < word)
+            root->right = deletetreeNode(root->right, word);
         else
         {
             // for one child or leaftreeNode
@@ -263,8 +264,8 @@ class AVLTree
 
             // for 2 childern
             treeNode *temp = FindMax(root);
-            root->val = temp->val;
-            root->left = deletetreeNode(root->left, temp->val);
+            root->word = temp->word;
+            root->left = deletetreeNode(root->left, temp->word);
         }
         return root;
 
@@ -278,14 +279,16 @@ class AVLTree
         // LL case
         if (balanceFactor > 1 && getBalance(root->left) > 0)
             return rightRotation(root);
-        // L
+        // LR case
         if (balanceFactor > 1 && getBalance(root->left) < 0)
         {
             root->left = leftRotation(root->left);
             return rightRotation(root);
         }
+        // RR case
         if (balanceFactor < -1 && getBalance(root->right) <= 0)
             return leftRotation(root);
+        // RL case
         if (balanceFactor < -1 && getBalance(root->right) > 0)
         {
             root->right = rightRotation(root->right);
@@ -295,23 +298,60 @@ class AVLTree
         return root;
     }
 
-    // Preorder traversal to display the tree
-    void prstringInOrder(treeNode *root)
+    bool SearchNode(treeNode *root, string word)
     {
         if (root == nullptr)
-            return;
+            return false;
+        if (root->word == word)
+            return true;
 
-        prstringInOrder(root->left);
-        cout << root->val << " ";
-        prstringInOrder(root->right);
+        else if (root->word > word)
+            return SearchNode(root->left, word);
+        else
+            return SearchNode(root->right, word);
     }
 
     ////////////////////////
     /// calling functions///
 
-    void inserttreeNode(string val) { root = insert(root, val); }
-    void Delete(string val) { root = deletetreeNode(root, val); }
-    void display() { prstringInOrder(root); }
+    void insertTreeNode(string word) { root = insert(root, word); }
+    void Delete(string word) { root = deletetreeNode(root, word); }
+    bool Search(string word) { return SearchNode(root, word); }
 };
 
-string main() { return 0; }
+AVLTree *readDictFile()
+{
+    AVLTree *tree = new AVLTree();
+
+    ifstream file("dictionary.txt");
+    if (file.is_open())
+    {
+        string line;
+        while (getline(file, line))
+        {
+            // inserting it to the AVL tree
+            tree->insertTreeNode(line);
+        }
+    }
+    else
+    {
+        // show error and close window
+        mvprintw(0, 0, "error in opening file");
+        getch();
+        endwin();
+        exit(0);
+    }
+    file.close();
+
+    return tree;
+}
+
+int main()
+{
+    initscr();
+    AVLTree *dict = readDictFile();
+    refresh();
+    getch();
+    endwin();
+    return 0;
+}
