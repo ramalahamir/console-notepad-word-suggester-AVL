@@ -39,7 +39,7 @@ class List
         temp->next = newNode;
     }
 
-    void printWord()
+    void Display()
     {
         Node *temp = head;
         while (temp != nullptr)
@@ -372,6 +372,7 @@ int main()
     // making the dictionary tree
     AVLTree *dict = readDictFile();
     Queue *wordQueue = new Queue();
+    List *Text = new List();
 
     cout << "\t\tNOTEPAD\n";
     cout << "\t-----------------------\n";
@@ -380,14 +381,25 @@ int main()
     do
     {
         input = getche(); // echoes onto the screen
+        Text->Insertion(input);
 
         // if space key isn't pressed keep enqueueing the word letters
         if (input != 32)
             wordQueue->enqueue(input);
         else
         {
+            // when space is pressed spell check is triggered
             // word suggestions and modifications
+            // delete the queue and make a new one
+            delete wordQueue;
+            wordQueue = new Queue();
         }
+
+        // clear screen everytime and show the updated text
+        system("CLS");
+        cout << "\t\tNOTEPAD\n";
+        cout << "\t-----------------------\n";
+        Text->Display();
 
     } while (input != 27); // ESC key (quit)
 
