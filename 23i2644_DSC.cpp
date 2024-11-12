@@ -82,6 +82,23 @@ class List
             file << temp->data;
             temp = temp->next;
         }
+        file.close();
+    }
+
+    void load()
+    {
+        ifstream file("load.txt");
+        Node *temp = head;
+
+        char ch;
+        while (temp != nullptr)
+        {
+            // insert if the character is present
+            if (file.get(ch))
+                Insertion(ch);
+            temp = temp->next;
+        }
+        file.close();
     }
 
     ~List()
@@ -399,9 +416,14 @@ int main()
         if (input == 19)
             Text->save();
 
+        // CTRL + L ascii
+        else if (input == 12)
+            Text->load();
+
         // if space key isn't pressed keep enqueueing the word letters
-        if (input != 32)
+        else if (input != 32)
             wordQueue->enqueue(input);
+
         else
         {
             // when space is pressed spell check is triggered
