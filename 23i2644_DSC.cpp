@@ -110,6 +110,7 @@ class List
 
     ~List()
     {
+        cout << "\nreleasing notepad memory...completed!";
         Node *curr = head;
         Node *NN;
         while (curr != nullptr)
@@ -170,6 +171,7 @@ class Queue
 
     ~Queue()
     {
+        cout << "\nreleasing queue memory...completed!";
         while (front != nullptr)
             dequeue();
     }
@@ -196,6 +198,22 @@ class AVLTree
 
   public:
     AVLTree() { root = nullptr; }
+    ~AVLTree()
+    {
+        cout << "\nreleasing dictionary memory...completed!";
+        releaseMemory(root);
+    }
+
+    // deleting in postorder this way childern are deleted first
+    // and no dangling pointers or issues occur
+    void releaseMemory(treeNode *root)
+    {
+        if (root == nullptr)
+            return;
+        releaseMemory(root->left);
+        releaseMemory(root->right);
+        delete root;
+    }
 
     int height(treeNode *N)
     {
@@ -457,6 +475,14 @@ int main()
         Text->Display();
 
     } while (input != 27); // ESC key (quit)
+
+    // releasing memories
+    if (wordQueue != nullptr)
+        delete wordQueue;
+    if (Text != nullptr)
+        delete Text;
+    if (dict != nullptr)
+        delete dict;
 
     return 0;
 }
