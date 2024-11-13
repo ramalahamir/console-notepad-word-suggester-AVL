@@ -88,18 +88,24 @@ class List
 
     void load()
     {
-        ifstream file("load.txt");
-        Node *temp = head;
-
-        char ch;
-        while (temp != nullptr)
+        ifstream file("save.txt");
+        if (file.is_open())
         {
-            // insert if the character is present
-            if (file.get(ch))
-                Insertion(ch);
-            temp = temp->next;
+            Node *temp = head;
+
+            char ch;
+            while (temp != nullptr)
+            {
+                // insert if the character is present
+                if (file.get(ch))
+                    Insertion(ch);
+                temp = temp->next;
+            }
+
+            file.close();
         }
-        file.close();
+        else
+            cout << "\nno presaved data!";
     }
 
     ~List()
