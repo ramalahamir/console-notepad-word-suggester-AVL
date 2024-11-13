@@ -65,12 +65,13 @@ class List
             return;
         }
 
-        // Traverse to the last letter
+        // delete the last letter
         Node *temp = head;
-        while (temp->next != nullptr)
+        while (temp->next->next != nullptr)
             temp = temp->next;
 
-        delete temp;
+        delete temp->next;
+        temp->next = nullptr;
     }
 
     void save()
@@ -409,8 +410,7 @@ int main()
     char input;
     do
     {
-        input = getche(); // echoes onto the screen
-        Text->Insertion(input);
+        input = getch();
 
         // CTRL + S ascii
         if (input == 19)
@@ -420,12 +420,23 @@ int main()
         else if (input == 12)
             Text->load();
 
+        // BACKSPACE ascii
+        //  NOT WORKINGGGGGGG
+        else if (input == 8)
+            Text->Backspace();
+
         // if space key isn't pressed keep enqueueing the word letters
         else if (input != 32)
+        {
+            // inserting to the list and queue
+            Text->Insertion(input);
             wordQueue->enqueue(input);
+        }
 
         else
         {
+            // space is also included into the list
+            Text->Insertion(input);
             // when space is pressed spell check is triggered
             // word suggestions and modifications
             // delete the queue and make a new one
