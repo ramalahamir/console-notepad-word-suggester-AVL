@@ -6,12 +6,12 @@
 
 using namespace std;
 
-struct Node
+template <typename T> struct Node
 {
-    char data;
+    T data;
     Node *next;
 
-    Node(char val)
+    Node(T val)
     {
         data = val;
         next = nullptr;
@@ -21,20 +21,20 @@ struct Node
 class List
 {
   private:
-    Node *head;
+    Node<char> *head;
 
   public:
     List() { head = nullptr; }
 
     void Insertion(char data)
     {
-        Node *newNode = new Node(data);
+        Node<char> *newNode = new Node(data);
         if (head == nullptr)
         {
             head = newNode;
             return;
         }
-        Node *temp = head;
+        Node<char> *temp = head;
         while (temp->next != nullptr)
             temp = temp->next;
         temp->next = newNode;
@@ -42,7 +42,7 @@ class List
 
     void Display()
     {
-        Node *temp = head;
+        Node<char> *temp = head;
         while (temp != nullptr)
         {
             cout << temp->data;
@@ -66,7 +66,7 @@ class List
         }
 
         // delete the last letter
-        Node *temp = head;
+        Node<char> *temp = head;
         while (temp->next->next != nullptr)
             temp = temp->next;
 
@@ -77,7 +77,7 @@ class List
     void save()
     {
         ofstream file("save.txt");
-        Node *temp = head;
+        Node<char> *temp = head;
         while (temp != nullptr)
         {
             file << temp->data;
@@ -91,7 +91,7 @@ class List
         ifstream file("save.txt");
         if (file.is_open())
         {
-            Node *temp = head;
+            Node<char> *temp = head;
 
             char ch;
             while (temp != nullptr)
@@ -108,11 +108,92 @@ class List
             cout << "\nno presaved data!";
     }
 
+    char Peek()
+    {
+        if (head == nullptr)
+            return ' ';
+        return head->data;
+    }
+
     ~List()
     {
         cout << "\nreleasing notepad memory...completed!";
-        Node *curr = head;
-        Node *NN;
+        Node<char> *curr = head;
+        Node<char> *NN;
+        while (curr != nullptr)
+        {
+            NN = curr->next;
+            delete curr;
+            curr = NN;
+        }
+    }
+};
+
+class StrList
+{
+  private:
+    Node<string> *head;
+
+  public:
+    StrList() { head = nullptr; }
+
+    void Insertion(string data)
+    {
+        Node<string> *newNode = new Node(data);
+        if (head == nullptr)
+        {
+            head = newNode;
+            return;
+        }
+        Node<string> *temp = head;
+        while (temp->next != nullptr)
+            temp = temp->next;
+        temp->next = newNode;
+    }
+
+    bool Display()
+    {
+        Node<string> *temp = head;
+
+        // if no suggestions found
+        if (head == nullptr)
+        {
+            cout << "\nNo suggestions found\n";
+            return false;
+        }
+
+        int i = 1;
+        cout << "\nsuggestions for correction: \n";
+        cout << "0. ignore all\n";
+
+        while (temp != nullptr)
+        {
+            cout << i << ". " << temp->data << endl;
+            temp = temp->next;
+            i++;
+        }
+        cout << endl;
+        return true;
+    }
+
+    string retrieveWord(int choice)
+    {
+        Node<string> *temp = head;
+        int i = 1;
+        while (temp != nullptr)
+        {
+            if (i == choice)
+                return temp->data;
+            temp = temp->next;
+            i++;
+        }
+        return "\0";
+    }
+
+    ~StrList()
+    {
+        Node<string> *curr = head;
+        Node<string> *NN;
         while (curr != nullptr)
         {
             NN = curr->next;
@@ -125,15 +206,15 @@ class List
 class Queue
 {
   private:
-    Node *front;
-    Node *rear;
+    Node<char> *front;
+    Node<char> *rear;
 
   public:
     Queue() { rear = front = nullptr; }
 
     void enqueue(char value)
     {
-        Node *newNode = new Node(value);
+        Node<char> *newNode = new Node(value);
         if (rear == nullptr)
         {
             front = rear = newNode;
@@ -148,7 +229,7 @@ class Queue
         if (front == nullptr)
             return '\0';
 
-        Node *temp = front;
+        Node<char> *temp = front;
         front = front->next;
 
         // list becomes empty
@@ -158,6 +239,18 @@ class Queue
         char data = temp->data;
         delete temp;
         return data;
+    }
+
+    string combineletters()
+    {
+        string word = "";
+        Node<char> *temp = front;
+        while (temp != nullptr)
+        {
+            word += temp->data;
+            temp = temp->next;
+        }
+        return word;
     }
 
     char peek()
@@ -171,7 +264,6 @@ class Queue
 
     ~Queue()
     {
-        cout << "\nreleasing queue memory...completed!";
         while (front != nullptr)
             dequeue();
     }
@@ -288,7 +380,7 @@ class AVLTree
         // RR case
         if (balanceFactor < -1 && word > root->right->word)
             return leftRotation(root);
-        // LR
+        // LR case
         if (balanceFactor > 1 && word > root->left->word)
         {
             root->left = leftRotation(root->left);
@@ -396,6 +488,34 @@ class AVLTree
     bool Search(string word) { return SearchNode(root, word); }
 };
 
+// word modification functions
+void letterSubstitution(string word, AVLTree *dict, StrList *&suggestions)
+{
+    if (suggestions == nullptr)
+        suggestions = new StrList();
+
+    // 25 * k tries
+    for (int i = 0; i < word.length(); i++)
+    {
+        string dummy_word = word; // to prserve the original
+        for (int j = 97; j <= 122; j++)
+        {
+            // replacing with a-z ascii one by one
+            dummy_word[i] = j;
+            // if modified word exists
+            if (dict->Search(dummy_word))
+                suggestions->Insertion(dummy_word);
+        }
+    }
+}
+
+StrList *modifiedWord(string word, AVLTree *dict)
+{
+    StrList *suggestions = nullptr;
+    letterSubstitution(word, dict, suggestions);
+    return suggestions;
+}
+
 AVLTree *readDictFile()
 {
     AVLTree *tree = new AVLTree();
@@ -416,7 +536,6 @@ AVLTree *readDictFile()
         cout << "error opening file";
     }
     file.close();
-
     return tree;
 }
 
@@ -432,9 +551,19 @@ int main()
     cout << "\t-----------------------\n";
 
     char input;
+    // keeps track of if the word or corrected or not
+    bool corrected = false;
     do
     {
         input = getch();
+
+        // set new queue for new word after space
+        if (wordQueue == nullptr)
+        {
+            wordQueue = new Queue();
+            // reset the flag for a new word
+            corrected = false;
+        }
 
         // CTRL + S ascii
         if (input == 19)
@@ -445,7 +574,6 @@ int main()
             Text->load();
 
         // BACKSPACE ascii
-        //  NOT WORKINGGGGGGG
         else if (input == 8)
             Text->Backspace();
 
@@ -457,15 +585,63 @@ int main()
             wordQueue->enqueue(input);
         }
 
+        // when space is pressed spell check is triggered
         else
         {
-            // space is also included into the list
+            // space is also included into the Text list
             Text->Insertion(input);
-            // when space is pressed spell check is triggered
-            // word suggestions and modifications
-            // delete the queue and make a new one
-            delete wordQueue;
-            wordQueue = new Queue();
+
+            // if the last character entered was also a space
+            if (Text->Peek() == ' ' || corrected == true)
+                continue;
+
+            // combining queue into a string
+            string checkWord = wordQueue->combineletters();
+            string correction = "";
+
+            // word suggestions and modifications if word
+            //  doesn't exist in dictionary
+            if (dict->Search(checkWord) == false)
+            {
+                StrList *suggestions = nullptr;
+                suggestions = modifiedWord(checkWord, dict);
+
+                // if suggestions exist then display menu
+                if (suggestions != nullptr)
+                {
+                    // clear screen first
+                    system("cls");
+                    // display suggestion menu
+                    // and returns state if suggestions exist
+                    bool correctWord = suggestions->Display();
+                    if (correctWord)
+                    {
+                        int choice;
+                        cout << "enter correction choice: ";
+                        cin >> choice;
+
+                        if (choice != 0)
+                        {
+                            correction = suggestions->retrieveWord(choice);
+                            cout << correction;
+                            // erase the incorrect word
+                            for (int i = 0; i <= checkWord.length(); i++)
+                                Text->Backspace();
+                            // enter the new word
+                            for (int i = 0; i <= correction.length(); i++)
+                                Text->Insertion(correction[i]);
+
+                            corrected = true;
+                        }
+                    }
+                }
+            }
+            // delete the queue and set it to null
+            if (wordQueue != nullptr)
+            {
+                delete wordQueue;
+                wordQueue = nullptr;
+            }
         }
 
         // clear screen everytime and show the updated text
