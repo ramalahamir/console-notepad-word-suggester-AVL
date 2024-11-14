@@ -628,7 +628,8 @@ int main()
                             for (int i = 0; i <= checkWord.length(); i++)
                                 Text->Backspace();
                             // enter the new word
-                            for (int i = 0; i <= correction.length(); i++)
+                            // < b/c not appending \0
+                            for (int i = 0; i < correction.length(); i++)
                                 Text->Insertion(correction[i]);
 
                             corrected = true;
