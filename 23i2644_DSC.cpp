@@ -94,13 +94,12 @@ class List
             Node<char> *temp = head;
 
             char ch;
+            // iterate till the cursor position in the text
             while (temp != nullptr)
-            {
-                // insert if the character is present
-                if (file.get(ch))
-                    Insertion(ch);
                 temp = temp->next;
-            }
+
+            while (file.get(ch)) // insert if the character is present
+                Insertion(ch);
 
             file.close();
         }
