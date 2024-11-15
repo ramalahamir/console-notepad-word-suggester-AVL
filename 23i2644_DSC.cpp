@@ -159,6 +159,7 @@ class StrList
         if (head == nullptr)
         {
             cout << "\nNo suggestions found\n";
+            // getch();
             return false;
         }
 
@@ -509,10 +510,35 @@ void letterSubstitution(string word, AVLTree *dict, StrList *&suggestions)
     }
 }
 
+void letterOmission(string word, AVLTree *dict, StrList *&suggestions)
+{
+    if (suggestions == nullptr)
+        suggestions = new StrList();
+
+    string dummy_word; // to prserve the original
+
+    // k tries
+    for (int i = 0; i < word.length(); i++)
+    {
+        dummy_word = "";
+        // store the word with omitted letter
+        for (int j = 0; j < word.length(); j++)
+        {
+            // make the new word
+            if (j != i)
+                dummy_word += word[j];
+        }
+        // if modified word exists
+        if (dict->Search(dummy_word))
+            suggestions->Insertion(dummy_word);
+    }
+}
+
 StrList *modifiedWord(string word, AVLTree *dict)
 {
     StrList *suggestions = nullptr;
     letterSubstitution(word, dict, suggestions);
+    letterOmission(word, dict, suggestions);
     return suggestions;
 }
 
