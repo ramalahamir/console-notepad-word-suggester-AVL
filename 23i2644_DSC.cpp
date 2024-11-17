@@ -533,11 +533,34 @@ void letterOmission(string word, AVLTree *dict, StrList *&suggestions)
     }
 }
 
+void letterInsertion(string word, AVLTree *dict, StrList *&suggestions)
+{
+    if (suggestions == nullptr)
+        suggestions = new StrList();
+
+    // 26 * k+1 tries
+    for (int i = 0; i < word.length(); i++)
+    {
+        string original_word = word; // to prserve the original
+        string dummy_word;
+        for (int j = 97; j <= 122; j++)
+        {
+            // inserting new letter
+            dummy_word =
+                original_word.substr(0, i) + (char)j + original_word.substr(i);
+            // if modified word exists
+            if (dict->Search(dummy_word))
+                suggestions->Insertion(dummy_word);
+        }
+    }
+}
+
 StrList *modifiedWord(string word, AVLTree *dict)
 {
     StrList *suggestions = nullptr;
     letterSubstitution(word, dict, suggestions);
     letterOmission(word, dict, suggestions);
+    letterInsertion(word, dict, suggestions);
     return suggestions;
 }
 
