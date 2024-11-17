@@ -491,6 +491,7 @@ class AVLTree
 // word modification functions
 void letterSubstitution(string word, AVLTree *dict, StrList *&suggestions)
 {
+    // incase the list is empty
     if (suggestions == nullptr)
         suggestions = new StrList();
 
@@ -511,6 +512,7 @@ void letterSubstitution(string word, AVLTree *dict, StrList *&suggestions)
 
 void letterOmission(string word, AVLTree *dict, StrList *&suggestions)
 {
+    // incase the list is empty
     if (suggestions == nullptr)
         suggestions = new StrList();
 
@@ -535,6 +537,7 @@ void letterOmission(string word, AVLTree *dict, StrList *&suggestions)
 
 void letterInsertion(string word, AVLTree *dict, StrList *&suggestions)
 {
+    // incase the list is empty
     if (suggestions == nullptr)
         suggestions = new StrList();
 
@@ -555,12 +558,38 @@ void letterInsertion(string word, AVLTree *dict, StrList *&suggestions)
     }
 }
 
+void swap(char &a, char &b)
+{
+    char temp = a;
+    a = b;
+    b = temp;
+}
+
+void letterReversal(string word, AVLTree *dict, StrList *&suggestions)
+{
+    // incase the list is empty
+    if (suggestions == nullptr)
+        suggestions = new StrList();
+
+    // k-1 tries
+    for (int i = 0; i < word.length() - 1; i++)
+    {
+        string dummy_word = word; // preserve the original
+        // swap the characters
+        swap(dummy_word[i], dummy_word[i + 1]);
+        // if modified word exists
+        if (dict->Search(dummy_word))
+            suggestions->Insertion(dummy_word);
+    }
+}
+
 StrList *modifiedWord(string word, AVLTree *dict)
 {
     StrList *suggestions = nullptr;
     letterSubstitution(word, dict, suggestions);
     letterOmission(word, dict, suggestions);
     letterInsertion(word, dict, suggestions);
+    letterReversal(word, dict, suggestions);
     return suggestions;
 }
 
@@ -634,6 +663,7 @@ int main()
         }
 
         // when space is pressed spell check is triggered
+        ////////////////////////////// BUG Present here!
         else
         {
             // space is also included into the Text list
